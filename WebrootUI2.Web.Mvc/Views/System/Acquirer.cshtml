@@ -7,19 +7,19 @@
                 <div class="span3">
                      <div class="input-prepend">
                     <label>@Resource.Input_Name</label>
-                    <input id="acquireName" type="text" value="@Model.name" />
+                    <input id="name" name="name" type="text" value="@Model.name" />
                          </div>
                 </div>
                 <div class="span3">
                      <div class="input-prepend">
                     <label>@Resource.Acquire_LogicalId</label>
-                    <input id="acquireLogicalId" type="text"  value="@Model.LogicalId" />
+                    <input id="LogicalId" name="LogicalId" type="text"  value="@Model.LogicalId" />
                          </div>
                 </div>
                 <div class="span3">
                      <div class="input-prepend">
                     <label>@Resource.Acquire_Enabled</label>
-                    <input type="checkbox" id="acquireEnabled" checked="@Model.Enabled" />
+                    @Html.CheckBox("Enabled",Model.Enabled)
                          </div>
                 </div>
                 <div>
@@ -82,20 +82,14 @@
                 }
             });
         })
-        //$('#btnAdd').click(function () {
-        //    $.getJSON("/System/SaveAcquire", { name: $('#acquireName').val(), LogicalId: $('#acquireLogicalId').val(), Enabled: $('#acquireEnabled').is(':checked') }, function (data) {
-        //        if (data.status == "success") {
-        //            $('#acquireName').val('');
-        //            $('#acquireLogicalId').val('0');
-        //            $('#acquireEnabled').attr('checked', '');
-        //            loadUsersTable(data.acquireList, 1, data.recordsCount);
-        //        }
-        //    });
-        //});
         $('#formLogin').validate({
             rules: {
                 acquireName: { required: true },
-                acquireLogicalId : { required: true }
+                acquireLogicalId: { required: true,digits:true }
+            },
+            submitHandler: function (form) {
+                // do other stuff for a valid form
+                $('#formLogin').submit();
             },
             highlight: function (element) {
                 $(element).closest('div').addClass("f_error");
@@ -110,6 +104,7 @@
             errorPlacement: function (error, element) {
                 $(element).closest('div').append(error);
             }
+
         });
 
         //Load paging in the initial load
@@ -135,7 +130,7 @@
 
     //Method which triggers the paging index change
     function indexChanged(_index) {
-        $.getJSON("/System/PagingIndexChanged", { index: _index }, function (data) {
+        $.getJSON("/System/AcquiresPagingIndexChanged", { index: _index }, function (data) {
             if (data.status == "success")
                 loadUsersTable(data.usersList, data.currentIndex, data.recordsCount);
         });

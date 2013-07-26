@@ -11,6 +11,7 @@ using WebrootUI2.Web.Mvc.Controllers.Queries;
 using WebrootUI2.Web.Mvc.Controllers.ViewModels;
 using WebrootUI2.Web.Mvc.Filters;
 using WebrootUI2.Domain;
+using WebrootUI2.Resources;
 
 namespace WebrootUI2.Web.Mvc.Controllers
 {
@@ -95,17 +96,20 @@ namespace WebrootUI2.Web.Mvc.Controllers
             }
             else
             {
-                acquiremodel.Acquires = acquireTask.GetAllAquires().Take(Setting.Page_Size).ToList();
+                acquiremodel.Acquires = acquireTask.GetAllAquires().ToList();
                 acquiremodel.TotalRecordsCount = acquiremodel.Acquires.Count;
-                HttpContext.Cache["acquireModel"] = new AcquirerModel() { Acquires = acquiremodel.Acquires };
+                HttpContext.Cache["acquireModel"] = new AcquirerModel() { Acquires = acquiremodel.Acquires.Take(Setting.Page_Size).ToList() };
             }
             return View(acquiremodel);
         }
-        [HttpGet]
-        public JsonResult SaveAcquire(string name, int LogicalId, bool Enabled)
+        
+        public ActionResult SaveAcquire()
         {
             var acquires = new List<Acquire>();
             var count = 0;
+            var name = Request.Form.GetValues(CommonResources.Acquire_name.ToLower())[0];
+            var LogicalId = Convert.ToInt32(Request.Form.GetValues(CommonResources.Acquire_LogicalId.ToLower())[0]);
+            var Enabled = Convert.ToBoolean(Request.Form.GetValues(CommonResources.Acquire_Enabled.ToLower())[0]);
             var _acquire = new Acquire();
             _acquire.name = name;
             _acquire.Enabled = Enabled;
@@ -114,9 +118,7 @@ namespace WebrootUI2.Web.Mvc.Controllers
             acquires = acquireTask.GetAllAquires();
             HttpContext.Cache["acquireModel"] = new AcquirerModel() { name = name, LogicalId = LogicalId, Acquires = acquires };
             count = acquires.Count;
-
-            return Json(new { status = "success", acquireList = acquires.Take(Setting.Page_Size).ToList<Acquire>(), recordsCount = count }
-                , JsonRequestBehavior.AllowGet);
+            return RedirectToAction("Acquirer");
         }
         /// <summary>
         /// Search Acquirers
@@ -162,6 +164,26 @@ namespace WebrootUI2.Web.Mvc.Controllers
 
             return Json(new { status = "success", userList = users.Take(Setting.Page_Size).ToList<UserModel>(), recordsCount = count }
                 , JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Fetch data from the cached users list in the page index change
+        /// </summary>
+        [HttpGet]
+        public JsonResult AcquiresPagingIndexChanged(int index)
+        {
+            var count = 0;
+            var users = new List<Acquire>();
+            var cachedAuditModel = (AcquirerModel)HttpContext.Cache["acquireModel"];
+
+            if (cachedAuditModel == null)
+                return Json(new { status = "failed" });
+
+            users = cachedAuditModel.Acquires.Skip((index - 1) * Setting.Page_Size).Take(Setting.Page_Size).ToList<Acquire>();
+            count = cachedAuditModel.Acquires.Count;
+
+            return Json(new { status = "success", acquireList = users, currentIndex = index, recordsCount = count }, JsonRequestBehavior.AllowGet);
+
         }
 
         /// <summary>
