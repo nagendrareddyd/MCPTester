@@ -84,8 +84,8 @@
         })
         $('#formLogin').validate({
             rules: {
-                acquireName: { required: true },
-                acquireLogicalId: { required: true,digits:true }
+                name: { required: true },
+                LogicalId: { required: true,digits:true }
             },
             submitHandler: function (form) {
                 // do other stuff for a valid form
@@ -132,7 +132,7 @@
     function indexChanged(_index) {
         $.getJSON("/System/AcquiresPagingIndexChanged", { index: _index }, function (data) {
             if (data.status == "success")
-                loadUsersTable(data.usersList, data.currentIndex, data.recordsCount);
+                loadUsersTable(data.acquireList, data.currentIndex, data.recordsCount);
         });
     }
 </script>

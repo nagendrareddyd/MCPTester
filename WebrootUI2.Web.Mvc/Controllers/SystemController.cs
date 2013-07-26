@@ -85,7 +85,7 @@ namespace WebrootUI2.Web.Mvc.Controllers
         public ActionResult Acquirer()
         {
             var acquiremodel = new AcquirerModel { Enabled = false, LogicalId = 0, name = string.Empty };
-            if (Request.QueryString["isCa"] != null && Request.QueryString["isCa"] == "true" && HttpContext.Cache["auditModel"] != null)
+            if (HttpContext.Cache["acquireModel"] != null)
             {
                 var cachedAcquireModel = (AcquirerModel)HttpContext.Cache["acquireModel"];
 
@@ -98,7 +98,8 @@ namespace WebrootUI2.Web.Mvc.Controllers
             {
                 acquiremodel.Acquires = acquireTask.GetAllAquires().ToList();
                 acquiremodel.TotalRecordsCount = acquiremodel.Acquires.Count;
-                HttpContext.Cache["acquireModel"] = new AcquirerModel() { Acquires = acquiremodel.Acquires.Take(Setting.Page_Size).ToList() };
+                HttpContext.Cache["acquireModel"] = new AcquirerModel() { Acquires = acquiremodel.Acquires.ToList() };
+                acquiremodel.Acquires = acquiremodel.Acquires.Take(Setting.Page_Size).ToList();
             }
             return View(acquiremodel);
         }
