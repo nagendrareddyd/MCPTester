@@ -1,0 +1,143 @@
+﻿@using WebrootUI2.Resources;
+@model WebrootUI2.Web.Mvc.Controllers.ViewModels.AcquirerModel
+@{
+    <div class="heading">
+        <div class="row-fluid">
+            <form id="formLogin" action="SaveAcquire" method="post" >
+                <div class="span3">
+                     <div class="input-prepend">
+                    <label>@Resource.Input_Name</label>
+                    <input id="acquireName" type="text" value="@Model.name" />
+                         </div>
+                </div>
+                <div class="span3">
+                     <div class="input-prepend">
+                    <label>@Resource.Acquire_LogicalId</label>
+                    <input id="acquireLogicalId" type="text"  value="@Model.LogicalId" />
+                         </div>
+                </div>
+                <div class="span3">
+                     <div class="input-prepend">
+                    <label>@Resource.Acquire_Enabled</label>
+                    <input type="checkbox" id="acquireEnabled" checked="@Model.Enabled" />
+                         </div>
+                </div>
+                <div>
+                    <input id="btnAdd" type="submit" class="btn" value="@Resource.Button_Add" style="margin-top: 2.5%" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="heading">
+        <div class="row-fluid">
+            <div class="span3">
+                <label>@Resource.Input_Name</label>
+                <input id="txtName" type="text" value="@Model.name" />
+            </div>
+            <div class="span3">
+                <label>@Resource.Acquire_LogicalId</label>
+                <input id="txtLogicalId" type="text"  value="@Model.LogicalId" />
+            </div>
+            <div>
+                <input id="btnSearch" type="submit" class="btn" value="@Resource.Button_Search" style="margin-top: 2.5%" />
+            </div>
+        </div>
+    </div>
+    <table id="tableAcquires" class="table table-striped table-bordered dTableR dataTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Logicalid</th>
+                <th>Enabled</th>
+            </tr>
+        </thead>
+
+        @foreach (var acquire in @Model.Acquires)
+        {
+            <tr>
+                <td>@acquire.name</td>
+                <td>@acquire.LogicalId</td>
+                <td>@acquire.Enabled</td>
+            </tr> 
+        }
+    </table>
+    <div id="pagingDiv"></div>
+}
+
+@section Sidebar
+{
+    @Helpers.SideBarTabGroup("Audit", Resource.AuditMenuItem, new Dictionary<string, string>() { { "View", "Index" } })
+    @Helpers.SideBarTabGroup("Config", Resource.ConfigMenuItem, new Dictionary<string, string>() {{Resource.MenuItem_Bin,"Bin"},
+{Resource.MenuItem_Module,"Module"},{Resource.MenuItem_Acquire,"Acquirer"},{Resource.MenuItem_Van,"Van"}})
+}
+
+<script type="text/ecmascript">
+    $(document).ready(function myfunction() {
+        $('#btnSearch').click(function () {
+            $.getJSON("/System/AcquirerSearch", { name: $('#txtName').val(), LogicalId: $('#txtLogicalId').val() }, function (data) {
+                if (data.status == "success") {
+                    $('#txtName').val('');
+                    $('#txtLogicalId').val('0');
+                    loadUsersTable(data.acquireList, 1, data.recordsCount);
+                }
+            });
+        })
+        //$('#btnAdd').click(function () {
+        //    $.getJSON("/System/SaveAcquire", { name: $('#acquireName').val(), LogicalId: $('#acquireLogicalId').val(), Enabled: $('#acquireEnabled').is(':checked') }, function (data) {
+        //        if (data.status == "success") {
+        //            $('#acquireName').val('');
+        //            $('#acquireLogicalId').val('0');
+        //            $('#acquireEnabled').attr('checked', '');
+        //            loadUsersTable(data.acquireList, 1, data.recordsCount);
+        //        }
+        //    });
+        //});
+        $('#formLogin').validate({
+            rules: {
+                acquireName: { required: true },
+                acquireLogicalId : { required: true }
+            },
+            highlight: function (element) {
+                $(element).closest('div').addClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            unhighlight: function (element) {
+                $(element).closest('div').removeClass("f_error");
+                setTimeout(function () {
+                }, 200)
+            },
+            errorPlacement: function (error, element) {
+                $(element).closest('div').append(error);
+            }
+        });
+
+        //Load paging in the initial load
+        $('#pagingDiv').empty();
+        $('#pagingDiv').append(pagination(8, 1, "@Model.TotalRecordsCount"));
+    });
+
+
+    //Load the Users list on search
+    function loadUsersTable(users, currentIndex, count) {
+        $('#tableAcquires').empty();
+        $('#tableAcquires').append("<thead><tr><th>Name</th><th>LogicalId</th><th>Enabled</th></tr></thead>");
+
+        $.each(users, function (index, value) {
+            $('#tableAcquires').append("<tr><td>" + value.name + "</td><td>"
+                + value.LogicalId + "</td><td>"  + value.Enabled + "</td>"
+                + "</tr>");
+        });
+
+        $('#pagingDiv').empty();
+        $('#pagingDiv').append(pagination(8, currentIndex, count));
+    }
+
+    //Method which triggers the paging index change
+    function indexChanged(_index) {
+        $.getJSON("/System/PagingIndexChanged", { index: _index }, function (data) {
+            if (data.status == "success")
+                loadUsersTable(data.usersList, data.currentIndex, data.recordsCount);
+        });
+    }
+</script>
