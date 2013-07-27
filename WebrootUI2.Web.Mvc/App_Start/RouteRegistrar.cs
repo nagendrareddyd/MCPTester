@@ -46,7 +46,7 @@
             routes.MapRoute(
                 "Default",
                 "{controller}/{action}/{id}",
-                new { controller = "App", action = "HttpNotFoundError", id = UrlParameter.Optional });
+                new { controller = "Admin", action = "Home", id = UrlParameter.Optional });
         }
     }
 }
