@@ -10,7 +10,7 @@ namespace WebrootUI2.Domain.Contracts.Tasks
 {
     public interface IAcquirerTask
     {
-        List<Acquire> Search(string name, int LogicalId);
+        List<Acquire> Search(string name, int? LogicalId);
         List<Acquire> GetAllAquires();
         Acquire GetAcquirerById(int AcquirerId);
         bool UpdateAcquirer(Acquire acquirer);

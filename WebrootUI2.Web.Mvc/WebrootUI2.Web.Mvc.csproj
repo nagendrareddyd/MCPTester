@@ -299,6 +299,7 @@
     <Content Include="Global.asax" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\jquery.form.js" />
     <Content Include="XmlFiles\SecurityQuestion.xml" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>

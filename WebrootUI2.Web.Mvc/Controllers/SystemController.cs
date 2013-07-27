@@ -84,10 +84,10 @@ namespace WebrootUI2.Web.Mvc.Controllers
         /// </summary>
         public ActionResult Acquirer()
         {
-            var acquiremodel = new AcquirerModel { Enabled = false, LogicalId = 0, name = string.Empty };
+            var acquiremodel = new Acquire { Enabled = false, LogicalId = 0, name = string.Empty };
             if (HttpContext.Cache["acquireModel"] != null)
             {
-                var cachedAcquireModel = (AcquirerModel)HttpContext.Cache["acquireModel"];
+                var cachedAcquireModel = (Acquire)HttpContext.Cache["acquireModel"];
 
                 acquiremodel.name = cachedAcquireModel.name;
                 acquiremodel.LogicalId = cachedAcquireModel.LogicalId;
@@ -98,7 +98,7 @@ namespace WebrootUI2.Web.Mvc.Controllers
             {
                 acquiremodel.Acquires = acquireTask.GetAllAquires().ToList();
                 acquiremodel.TotalRecordsCount = acquiremodel.Acquires.Count;
-                HttpContext.Cache["acquireModel"] = new AcquirerModel() { Acquires = acquiremodel.Acquires.ToList() };
+                HttpContext.Cache["acquireModel"] = new Acquire() { Acquires = acquiremodel.Acquires.ToList() };
                 acquiremodel.Acquires = acquiremodel.Acquires.Take(Setting.Page_Size).ToList();
             }
             return View(acquiremodel);
@@ -117,7 +117,7 @@ namespace WebrootUI2.Web.Mvc.Controllers
             _acquire.LogicalId = LogicalId;
             acquireTask.UpdateAcquirer(_acquire);
             acquires = acquireTask.GetAllAquires();
-            HttpContext.Cache["acquireModel"] = new AcquirerModel() { name = name, LogicalId = LogicalId, Acquires = acquires };
+            HttpContext.Cache["acquireModel"] = new Acquire() { name = name, LogicalId = LogicalId, Acquires = acquires };
             count = acquires.Count;
             return RedirectToAction("Acquirer");
         }
@@ -132,7 +132,7 @@ namespace WebrootUI2.Web.Mvc.Controllers
             var count = 0;
 
             acquires =  acquireTask.Search(name == null ? string.Empty : name, LogicalId);
-            HttpContext.Cache["acquireModel"] = new AcquirerModel() { name = name, LogicalId = LogicalId, Acquires = acquires };
+            HttpContext.Cache["acquireModel"] = new Acquire() { name = name, LogicalId = LogicalId, Acquires = acquires };
             count = acquires.Count;
 
             return Json(new { status = "success", acquireList = acquires.Take(Setting.Page_Size).ToList<Acquire>(), recordsCount = count }
@@ -175,7 +175,7 @@ namespace WebrootUI2.Web.Mvc.Controllers
         {
             var count = 0;
             var users = new List<Acquire>();
-            var cachedAuditModel = (AcquirerModel)HttpContext.Cache["acquireModel"];
+            var cachedAuditModel = (Acquire)HttpContext.Cache["acquireModel"];
 
             if (cachedAuditModel == null)
                 return Json(new { status = "failed" });

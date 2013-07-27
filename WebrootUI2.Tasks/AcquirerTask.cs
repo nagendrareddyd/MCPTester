@@ -29,7 +29,7 @@ namespace WebrootUI2.Tasks
 
         #region Administrator
 
-        public List<Acquire> Search(string name,int LogicalId)
+        public List<Acquire> Search(string name,int? LogicalId)
         {
             var users = new List<Acquire>();
 

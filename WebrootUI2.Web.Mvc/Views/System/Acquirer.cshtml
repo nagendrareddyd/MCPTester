@@ -1,17 +1,17 @@
 ﻿@using WebrootUI2.Resources;
-@model WebrootUI2.Web.Mvc.Controllers.ViewModels.AcquirerModel
+@model WebrootUI2.Domain.Models.Acquire
 @{
     <div class="heading">
         <div class="row-fluid">
             <form id="formLogin" action="SaveAcquire" method="post" >
                 <div class="span3">
-                     <div class="input-prepend">
+                     <div class="">
                     <label>@Resource.Input_Name</label>
                     <input id="name" name="name" type="text" value="@Model.name" />
                          </div>
                 </div>
                 <div class="span3">
-                     <div class="input-prepend">
+                     <div class="">
                     <label>@Resource.Acquire_LogicalId</label>
                     <input id="LogicalId" name="LogicalId" type="text"  value="@Model.LogicalId" />
                          </div>
@@ -69,15 +69,15 @@
     @Helpers.SideBarTabGroup("Audit", Resource.AuditMenuItem, new Dictionary<string, string>() { { "View", "Index" } })
     @Helpers.SideBarTabGroup("Config", Resource.ConfigMenuItem, new Dictionary<string, string>() {{Resource.MenuItem_Bin,"Bin"},
 {Resource.MenuItem_Module,"Module"},{Resource.MenuItem_Acquire,"Acquirer"},{Resource.MenuItem_Van,"Van"}})
+
 }
 
 <script type="text/ecmascript">
     $(document).ready(function myfunction() {
+        
         $('#btnSearch').click(function () {
             $.getJSON("/System/AcquirerSearch", { name: $('#txtName').val(), LogicalId: $('#txtLogicalId').val() }, function (data) {
                 if (data.status == "success") {
-                    $('#txtName').val('');
-                    $('#txtLogicalId').val('0');
                     loadUsersTable(data.acquireList, 1, data.recordsCount);
                 }
             });
